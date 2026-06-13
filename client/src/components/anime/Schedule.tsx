@@ -34,7 +34,7 @@ const Schedule: React.FC = () => {
       setLoading(true)
       setError(null)
       try {
-        const response = await fetch(`/api/schedule/${date}`)
+        const response = await fetch(`/api/anime/schedule/${date}`, { credentials: 'include' })
         if (!response.ok) throw new Error('Failed to fetch episode schedule')
         const data = await response.json()
         setScheduleData(data)

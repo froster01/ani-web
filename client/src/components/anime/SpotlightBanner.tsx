@@ -28,7 +28,7 @@ interface ShowMeta {
 }
 
 const fetchShowMeta = async (id: string): Promise<ShowMeta> => {
-  const res = await fetch(`/api/show-meta/${id}`)
+  const res = await fetch(`/api/anime/show-meta/${id}`, { credentials: 'include' })
   if (!res.ok) return {}
   return res.json()
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   FaSearch,
   FaFilter,
@@ -14,6 +15,7 @@ import { Button } from '../components/common/Button'
 import ErrorMessage from '../components/common/ErrorMessage'
 import SearchableSelect from '../components/common/SearchableSelect'
 import ToggleSwitch from '../components/common/ToggleSwitch'
+import AnimePaheCookieModal from '../components/anime/AnimePaheCookieModal'
 import { usePaginatedSearchAnime, useGenresAndStudios } from '../hooks/useAnimeData'
 import { useLowEndMode } from '../contexts/LowEndModeContext'
 import { hideVirtualKeyboard } from '../hooks/useVirtualKeyboard'
@@ -57,8 +59,10 @@ export default function Search() {
   const [country, setCountry] = useState(searchParams.get('country') || 'ALL')
   const [studio, setStudio] = useState(searchParams.get('studios') || 'ALL')
   const [showFilters, setShowFilters] = useState(false)
+  const [showCookieModal, setShowCookieModal] = useState(false)
   const { lowEndMode } = useLowEndMode()
   const resultsRef = useRef<HTMLDivElement>(null)
+  const queryClient = useQueryClient()
 
   const { data: metaData } = useGenresAndStudios()
   const availableGenres = metaData?.genres || []
@@ -88,6 +92,13 @@ export default function Search() {
   const { data: nextPageData } = usePaginatedSearchAnime(filterString, page + 1, 14)
 
   const [showMature, setShowMature] = useState(false)
+
+  // Handle AUTH_REQUIRED error
+  useEffect(() => {
+    if (error && (error as Error & { provider?: string }).message === 'AUTH_REQUIRED') {
+      setShowCookieModal(true)
+    }
+  }, [error])
 
   const filteredResults = React.useMemo(() => {
     if (showMature) return results
@@ -332,7 +343,17 @@ export default function Search() {
         </div>
       </div>
 
-      {isError && <ErrorMessage message={error?.message || 'Error'} />}
+      {isError && (error as Error).message !== 'AUTH_REQUIRED' && (
+        <ErrorMessage message={error?.message || 'Error'} />
+      )}
+
+      <AnimePaheCookieModal
+        isOpen={showCookieModal}
+        onClose={() => setShowCookieModal(false)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['searchAnime'] })
+        }}
+      />
 
       <div className={styles.resultsHeader} ref={resultsRef}>
         <h2 className={styles.resultsTitle}>

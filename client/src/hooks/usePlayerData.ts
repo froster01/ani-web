@@ -41,7 +41,7 @@ const fetchApi = async (url: string) => {
   if (animepaheUa) headers['x-animepahe-ua'] = animepaheUa
   if (animepaheCookie) headers['x-animepahe-cookie'] = animepaheCookie
 
-  const response = await fetch(url, { headers })
+  const response = await fetch(url, { credentials: 'include', headers })
   if (!response.ok) {
     if (response.status === 403) {
       const data = await response.json().catch(() => ({}))
@@ -83,10 +83,10 @@ export const usePlayerData = (
       if (!showId) throw new Error('No showId')
       try {
         const [meta, episodeData, watchlistStatus, watchedEpisodes] = await Promise.all([
-          fetchApi(`/api/show-meta/${showId}`),
-          fetchApi(`/api/episodes?showId=${showId}&mode=${uiState.currentMode}`).catch(() => null),
-          fetchApi(`/api/watchlist/check/${showId}`).catch(() => ({ inWatchlist: false })),
-          fetchApi(`/api/watched-episodes/${showId}`).catch(() => []),
+          fetchApi(`/api/anime/show-meta/${showId}`),
+          fetchApi(`/api/anime/episodes?showId=${showId}&mode=${uiState.currentMode}`).catch(() => null),
+          fetchApi(`/api/anime/watchlist/check/${showId}`).catch(() => ({ inWatchlist: false })),
+          fetchApi(`/api/anime/watched-episodes/${showId}`).catch(() => []),
         ])
 
         const episodes = episodeData?.episodes
@@ -151,7 +151,7 @@ export const usePlayerData = (
 
       try {
         let providerShowId = showId
-        if (['animepahe', '123anime', 'animeya', 'megaplay'].includes(uiState.selectedProvider)) {
+        if (['megaplay', 'anikoto'].includes(uiState.selectedProvider)) {
           const names = showData?.showMeta?.names
           // AlAnime's `name` field is often the native Japanese script (e.g. "ブリーチ"
           // for Bleach), which gets mapped to names.romaji. Sending katakana/kanji to
@@ -172,7 +172,7 @@ export const usePlayerData = (
 
           if (searchQuery) {
             const searchResults = await fetchApi(
-              `/api/search?query=${encodeURIComponent(searchQuery)}&provider=${uiState.selectedProvider}`
+              `/api/anime/search?query=${encodeURIComponent(searchQuery)}&provider=${uiState.selectedProvider}`
             )
             if (searchResults && searchResults.length > 0) {
               interface SearchResult {
@@ -230,11 +230,11 @@ export const usePlayerData = (
 
         const [sources, progress, preferredSourceData, skipTimesData] = await Promise.all([
           fetchApi(
-            `/api/video?showId=${providerShowId}&episodeNumber=${uiState.currentEpisode}&mode=${uiState.currentMode}&provider=${uiState.selectedProvider}`
+            `/api/anime/video?showId=${providerShowId}&episodeNumber=${uiState.currentEpisode}&mode=${uiState.currentMode}&provider=${uiState.selectedProvider}`
           ),
-          fetchApi(`/api/episode-progress/${showId}/${uiState.currentEpisode}`).catch(() => null),
-          fetchApi(`/api/settings?key=preferredSource`).catch(() => null),
-          fetchApi(`/api/skip-times/${showId}/${uiState.currentEpisode}`).catch(() => []),
+          fetchApi(`/api/anime/episode-progress/${showId}/${uiState.currentEpisode}`).catch(() => null),
+          fetchApi(`/api/anime/settings?key=preferredSource`).catch(() => null),
+          fetchApi(`/api/anime/skip-times/${showId}/${uiState.currentEpisode}`).catch(() => []),
         ])
 
         const preferredSourceName = preferredSourceData?.value
@@ -314,7 +314,7 @@ export const usePlayerData = (
 
   const { mutateAsync: toggleWatchlistMutation } = useMutation({
     mutationFn: async ({ wasIn, showMeta }: { wasIn: boolean; showMeta: DetailedShowMeta }) => {
-      const endpoint = wasIn ? '/api/watchlist/remove' : '/api/watchlist/add'
+      const endpoint = wasIn ? '/api/anime/watchlist/remove' : '/api/anime/watchlist/add'
       const payload = {
         id: showId,
         name: showMeta.name || showMeta.names?.romaji,
@@ -324,6 +324,7 @@ export const usePlayerData = (
         type: showMeta.type,
       }
       await fetch(endpoint, {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -345,7 +346,8 @@ export const usePlayerData = (
 
   const setPreferredSource = useCallback(async (sourceName: string) => {
     try {
-      await fetch('/api/settings', {
+      await fetch('/api/anime/settings', {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: 'preferredSource', value: sourceName }),
@@ -360,7 +362,8 @@ export const usePlayerData = (
       mutationFn: async ({ status }: { status: string }) => {
         if (!showId) throw new Error('Missing showId')
 
-        const response = await fetch('/api/watchlist/status', {
+        const response = await fetch('/api/anime/watchlist/status', {
+          credentials: 'include',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: showId, status }),
@@ -400,7 +403,8 @@ export const usePlayerData = (
       showMeta: DetailedShowMeta
       episodes: string[]
     }) => {
-      await fetch('/api/update-progress', {
+      await fetch('/api/anime/update-progress', {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

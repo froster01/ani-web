@@ -172,7 +172,8 @@ const Watchlist: React.FC = () => {
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      await fetch('/api/watchlist/status', {
+      await fetch('/api/anime/watchlist/status', {
+        credentials: 'include',
         method: 'POST',
         body: JSON.stringify({ id, status }),
         headers: { 'Content-Type': 'application/json' },
@@ -186,7 +187,8 @@ const Watchlist: React.FC = () => {
 
   const removeCw = useMutation({
     mutationFn: async (showId: string) => {
-      await fetch('/api/continue-watching/remove', {
+      await fetch('/api/anime/continue-watching/remove', {
+        credentials: 'include',
         method: 'POST',
         body: JSON.stringify({ showId }),
         headers: { 'Content-Type': 'application/json' },

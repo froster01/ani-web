@@ -3,16 +3,10 @@ import { useSearchParams } from 'react-router-dom'
 import { Button } from '../components/common/Button'
 import TitlePreferenceToggle from '../components/common/TitlePreferenceToggle'
 import styles from './Settings.module.css'
-import GitHubSyncSettings from '../components/settings/GitHubSyncSettings'
-import GoogleAuthSettings from '../components/settings/GoogleAuthSettings'
 import WatchlistSettings from '../components/settings/WatchlistSettings'
-import RcloneSettings from '../components/settings/RcloneSettings'
-import SyncProviderSelector from '../components/settings/SyncProviderSelector'
-import { FaCog, FaCloud, FaDatabase, FaList } from 'react-icons/fa'
+import { FaCog, FaDatabase, FaList } from 'react-icons/fa'
 import { useLowEndMode } from '../contexts/LowEndModeContext'
 import ToggleSwitch from '../components/common/ToggleSwitch'
-import packageJson from '../../../package.json'
-import { deleteTelemetryData } from '../hooks/useTelemetry'
 import {
   getVirtualKeyboardEnabled,
   VIRTUAL_KEYBOARD_ENABLED_CHANGE_EVENT,
@@ -20,39 +14,19 @@ import {
 } from '../hooks/useVirtualKeyboard'
 import { useSetting, useUpdateSetting } from '../hooks/useSettings'
 
-type SettingsTab = 'general' | 'sync' | 'watchlist' | 'database'
+type SettingsTab = 'general' | 'watchlist' | 'database'
 
 const Settings: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const initialTab = searchParams.get('tab') as SettingsTab | null
   const [activeTab, setActiveTab] = useState<SettingsTab>(
-    initialTab && ['general', 'sync', 'watchlist', 'database'].includes(initialTab)
+    initialTab && ['general', 'watchlist', 'database'].includes(initialTab)
       ? initialTab
       : 'general'
   )
   const [statusMessage, setStatusMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { lowEndMode, setLowEndMode } = useLowEndMode()
-  const [telemetryEnabled, setTelemetryEnabled] = useState(
-    localStorage.getItem('telemetry_enabled') !== 'false'
-  )
-  const [installationId, setInstallationId] = useState<string>(
-    localStorage.getItem('installation_id') || ''
-  )
-
-  useEffect(() => {
-    fetch('/api/installation-id')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.id) {
-          setInstallationId(data.id)
-          localStorage.setItem('installation_id', data.id)
-        }
-      })
-      .catch(() => {
-        // fallback: keep whatever is in localStorage
-      })
-  }, [])
   const [virtualKeyboardEnabled, setVirtualKeyboardEnabled] = useState(getVirtualKeyboardEnabled)
 
   const [discordEnabled, setDiscordEnabled] = useState(true)
@@ -72,14 +46,6 @@ const Settings: React.FC = () => {
     updateSetting.mutate({ key: 'discordRPCEnabled', value: String(enabled) })
   }
 
-  const toggleTelemetry = (enabled: boolean) => {
-    setTelemetryEnabled(enabled)
-    localStorage.setItem('telemetry_enabled', String(enabled))
-    if (!enabled) {
-      deleteTelemetryData()
-    }
-  }
-
   const toggleVirtualKeyboard = (enabled: boolean) => {
     setVirtualKeyboardEnabled(enabled)
     localStorage.setItem(VIRTUAL_KEYBOARD_ENABLED_KEY, String(enabled))
@@ -92,7 +58,7 @@ const Settings: React.FC = () => {
 
   React.useEffect(() => {
     const tab = searchParams.get('tab') as SettingsTab | null
-    if (tab && ['general', 'sync', 'watchlist', 'database'].includes(tab)) {
+    if (tab && ['general', 'watchlist', 'database'].includes(tab)) {
       setActiveTab(tab)
     }
   }, [searchParams])
@@ -105,7 +71,7 @@ const Settings: React.FC = () => {
   const handleBackup = async () => {
     setStatusMessage('Backing up database...')
     try {
-      const response = await fetch('/api/backup-db')
+      const response = await fetch('/api/anime/backup-db', { credentials: 'include' })
       if (response.ok) {
         const blob = await response.blob()
         const url = window.URL.createObjectURL(blob)
@@ -135,7 +101,8 @@ const Settings: React.FC = () => {
     formData.append('dbfile', file)
 
     try {
-      const response = await fetch('/api/restore-db', {
+      const response = await fetch('/api/anime/restore-db', {
+        credentials: 'include',
         method: 'POST',
         body: formData,
       })
@@ -235,63 +202,6 @@ const Settings: React.FC = () => {
                 </div>
               </div>
 
-              <div className={styles.settingItem} style={{ marginTop: '1.5rem' }}>
-                <div className={styles.settingRow}>
-                  <div style={{ minWidth: 0 }}>
-                    <h4 style={{ margin: 0, fontSize: '1rem' }}>Telemetry Tracking</h4>
-                    <p
-                      style={{
-                        margin: '0.25rem 0 0',
-                        fontSize: '0.85rem',
-                        color: 'var(--text-secondary)',
-                      }}
-                    >
-                      Share anonymous installation data to help track active users. Collected:
-                      Hardware-based Anonymous ID, App Version, First Seen/Last Seen timestamps, and
-                      User Agent string. No other personal information or usage habits are
-                      collected.
-                    </p>
-                  </div>
-                  <ToggleSwitch
-                    isChecked={telemetryEnabled}
-                    onChange={(e) => toggleTelemetry(e.target.checked)}
-                    id="telemetry-enabled"
-                  />
-                </div>
-                {telemetryEnabled && (
-                  <div
-                    style={{
-                      marginTop: '0.75rem',
-                      fontSize: '0.8rem',
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold' }}>
-                      Data currently being shared:
-                    </p>
-                    <div
-                      style={{
-                        background: '#1a1a1a',
-                        padding: '0.5rem',
-                        borderRadius: '4px',
-                        wordBreak: 'break-all',
-                        fontFamily: 'monospace',
-                      }}
-                    >
-                      <p style={{ margin: '0' }}>
-                        <strong>ID:</strong> {installationId || 'Loading...'}
-                      </p>
-                      <p style={{ margin: '0' }}>
-                        <strong>Version:</strong> {packageJson.version}
-                      </p>
-                      <p style={{ margin: '0' }}>
-                        <strong>Browser:</strong> {navigator.userAgent.substring(0, 60)}...
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
               {localStorage.getItem('agreedToViewMature') === 'true' && (
                 <div className={styles.settingItem} style={{ marginTop: '1.5rem' }}>
                   <div className={styles.settingRow}>
@@ -322,15 +232,6 @@ const Settings: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
-        )
-      case 'sync':
-        return (
-          <div className={styles.tabContent}>
-            <SyncProviderSelector />
-            <GitHubSyncSettings />
-            <GoogleAuthSettings />
-            <RcloneSettings />
           </div>
         )
       case 'watchlist':
@@ -371,7 +272,7 @@ const Settings: React.FC = () => {
     <div className="page-container">
       <div className={styles.settingsHeader}>
         <h1 className={styles.pageTitle}>Settings</h1>
-        <p className={styles.pageSubtitle}>Manage your preferences and data synchronization</p>
+        <p className={styles.pageSubtitle}>Manage your preferences</p>
       </div>
 
       <div className={styles.settingsLayout}>
@@ -381,12 +282,6 @@ const Settings: React.FC = () => {
             onClick={() => selectTab('general')}
           >
             <FaCog /> <span>General</span>
-          </button>
-          <button
-            className={`${styles.sidebarItem} ${activeTab === 'sync' ? styles.active : ''}`}
-            onClick={() => selectTab('sync')}
-          >
-            <FaCloud /> <span>Synchronization</span>
           </button>
           <button
             className={`${styles.sidebarItem} ${activeTab === 'watchlist' ? styles.active : ''}`}

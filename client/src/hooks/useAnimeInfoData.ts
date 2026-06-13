@@ -12,7 +12,7 @@ interface UseAnimeInfoDataReturn {
 }
 
 const fetchApi = async (url: string) => {
-  const response = await fetch(url)
+  const response = await fetch(url, { credentials: 'include' })
   if (!response.ok) throw new Error(`Failed to fetch ${url}`)
   return response.json()
 }
@@ -29,9 +29,9 @@ export function useAnimeInfoData(showId: string | undefined): UseAnimeInfoDataRe
     queryFn: async () => {
       if (!showId) throw new Error('No showId')
       const [meta, watchlistStatus, episodesResponse] = await Promise.all([
-        fetchApi(`/api/show-meta/${showId}`),
-        fetchApi(`/api/watchlist/check/${showId}`).catch(() => ({ inWatchlist: false })),
-        fetch(`/api/episodes?showId=${showId}&mode=sub`),
+        fetchApi(`/api/anime/show-meta/${showId}`),
+        fetchApi(`/api/anime/watchlist/check/${showId}`).catch(() => ({ inWatchlist: false })),
+        fetch(`/api/anime/episodes?showId=${showId}&mode=sub`, { credentials: 'include' }),
       ])
 
       let description = meta?.description
@@ -52,7 +52,7 @@ export function useAnimeInfoData(showId: string | undefined): UseAnimeInfoDataRe
 
   const { mutateAsync: toggleWatchlistMutation } = useMutation({
     mutationFn: async ({ wasIn, showMeta }: { wasIn: boolean; showMeta: DetailedShowMeta }) => {
-      const endpoint = wasIn ? '/api/watchlist/remove' : '/api/watchlist/add'
+      const endpoint = wasIn ? '/api/anime/watchlist/remove' : '/api/anime/watchlist/add'
       const payload = {
         id: showId,
         name: showMeta.name || showMeta.names?.romaji,
@@ -63,6 +63,7 @@ export function useAnimeInfoData(showId: string | undefined): UseAnimeInfoDataRe
       }
 
       const response = await fetch(endpoint, {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

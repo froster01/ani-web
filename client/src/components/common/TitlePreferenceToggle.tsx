@@ -52,7 +52,8 @@ const TitlePreferenceToggle: React.FC = () => {
         labelRef.current.style.opacity = '1'
       }
       try {
-        await fetch('/api/settings', {
+        await fetch('/api/anime/settings', {
+          credentials: 'include',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

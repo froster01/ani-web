@@ -58,7 +58,7 @@ const Insights: React.FC = () => {
   const { data, isLoading, isError } = useQuery<InsightData>({
     queryKey: ['insights'],
     queryFn: async () => {
-      const res = await fetch('/api/insights')
+      const res = await fetch('/api/anime/insights', { credentials: 'include' })
       if (!res.ok) throw new Error('Failed to fetch insights')
       return res.json()
     },

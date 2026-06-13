@@ -36,7 +36,8 @@ const MAL: React.FC = () => {
     const reader = new FileReader()
     reader.onload = async (e) => {
       try {
-        const response = await fetch('/api/import/mal-xml', {
+        const response = await fetch('/api/anime/import/mal-xml', {
+          credentials: 'include',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -143,7 +143,8 @@ const useVideoPlayer = ({
       payload.currentTime = timeToReport
       lastReportedTime.current = timeToReport
 
-      fetch('/api/update-progress', {
+      fetch('/api/anime/update-progress', {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -520,7 +521,8 @@ const useVideoPlayer = ({
 
     payload.currentTime = payload.duration
 
-    fetch('/api/update-progress', {
+    fetch('/api/anime/update-progress', {
+      credentials: 'include',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

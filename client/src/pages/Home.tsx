@@ -114,7 +114,8 @@ const Home: React.FC = () => {
 
   const removeCw = useMutation({
     mutationFn: async (showId: string) => {
-      await fetch('/api/continue-watching/remove', {
+      await fetch('/api/anime/continue-watching/remove', {
+        credentials: 'include',
         method: 'POST',
         body: JSON.stringify({ showId }),
         headers: { 'Content-Type': 'application/json' },

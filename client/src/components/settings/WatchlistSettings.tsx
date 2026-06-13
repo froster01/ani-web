@@ -10,7 +10,7 @@ const WatchlistSettings: React.FC = () => {
   useEffect(() => {
     const fetchSetting = async () => {
       try {
-        const response = await fetch('/api/settings?key=skipRemoveConfirmation')
+        const response = await fetch('/api/anime/settings?key=skipRemoveConfirmation', { credentials: 'include' })
         const data = await response.json()
         if (String(data.value) === 'true' || String(data.value) === '1') {
           setSkipConfirmation(true)
@@ -34,7 +34,8 @@ const WatchlistSettings: React.FC = () => {
     setSkipConfirmation(newValue)
 
     try {
-      await fetch('/api/settings', {
+      await fetch('/api/anime/settings', {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: 'skipRemoveConfirmation', value: newValue }),

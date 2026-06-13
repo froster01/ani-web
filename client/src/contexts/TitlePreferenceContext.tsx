@@ -23,7 +23,7 @@ export const TitlePreferenceProvider: React.FC<TitlePreferenceProviderProps> = (
   useEffect(() => {
     const fetchPreference = async () => {
       try {
-        const response = await fetch('/api/settings?key=titlePreference')
+        const response = await fetch('/api/anime/settings?key=titlePreference', { credentials: 'include' })
         if (response.ok) {
           const data = await response.json()
           if (data.value) {

@@ -9,7 +9,7 @@ export const fixThumbnailUrl = (
   if (!url || url.trim() === '') return '/placeholder.svg'
 
   // If it's already a full proxy URL, just handle dimensions
-  if (url.includes('/api/image-proxy')) {
+  if (url.includes('/api/anime/image-proxy')) {
     let finalUrl = url
     if (width && !finalUrl.includes('w=')) {
       const separator = finalUrl.includes('?') ? '&' : '?'
@@ -63,7 +63,7 @@ export const fixThumbnailUrl = (
   if (finalUrl.startsWith('https://s4.anilist.co')) {
     proxiedUrl = finalUrl // No proxy for anilist
   } else if (finalUrl.startsWith('http')) {
-    proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(finalUrl)}`
+    proxiedUrl = `/api/anime/image-proxy?url=${encodeURIComponent(finalUrl)}`
     if (width) proxiedUrl += `&w=${width}`
     if (height) proxiedUrl += `&h=${height}`
     else proxiedUrl += '&w=300'
@@ -74,7 +74,7 @@ export const fixThumbnailUrl = (
         ? 'https://aln.youtube-anime.com'
         : 'https://aln.youtube-anime.com/images'
     const fullUrl = `${host}/${finalUrl}`
-    proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(fullUrl)}`
+    proxiedUrl = `/api/anime/image-proxy?url=${encodeURIComponent(fullUrl)}`
     if (width) proxiedUrl += `&w=${width}`
     if (height) proxiedUrl += `&h=${height}`
     else proxiedUrl += '&w=300'
