@@ -4,22 +4,21 @@
   justify-content: center;
   gap: var(--space-2);
   border-radius: var(--radius-md);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-medium);
+  font-family: var(--font-heading);
   cursor: pointer;
   border: none;
   outline: none;
-  font-family: inherit;
   position: relative;
   white-space: nowrap;
-  font-size: var(--font-size-base);
-  background: transparent;
-  color: var(--text-primary);
+  font-size: var(--text-base);
   padding: var(--space-3) var(--space-6);
   min-height: 44px;
   transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    transform 0.1s ease;
+    background-color var(--duration-fast) var(--ease-out-quad),
+    color var(--duration-fast) var(--ease-out-quad),
+    transform var(--duration-fast) var(--ease-out-quart),
+    box-shadow var(--duration-fast) var(--ease-out-quad);
 }
 
 .btn:disabled {
@@ -28,80 +27,102 @@
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--accent-light);
+  outline: 3px solid var(--accent-glow);
   outline-offset: 2px;
 }
 
 /* ===== VARIANTS ===== */
+
+/* Primary: Solid amber fill */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  background: var(--accent-primary);
+  color: var(--bg-main);
+  box-shadow: 0 4px 12px oklch(0.70 0.15 70 / 0.25);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+  background: var(--accent-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 6px 16px oklch(0.70 0.15 70 / 0.35);
 }
 
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
+  background: var(--accent-primary-pressed);
 }
 
+/* Secondary: Neutral fill with border */
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-secondary);
   color: var(--text-primary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: var(--bg-elevated);
+  border-color: var(--border-secondary);
 }
 
+.btn-secondary:active:not(:disabled) {
+  background: var(--bg-tertiary);
+}
+
+/* Ghost: Transparent background */
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
+  background: oklch(0.98 0.002 70 / 0.05);
   color: var(--text-primary);
 }
 
+.btn-ghost:active:not(:disabled) {
+  background: oklch(0.98 0.002 70 / 0.08);
+}
+
+/* Danger: Red for destructive actions */
 .btn-danger {
-  background: var(--color-danger);
-  color: white;
+  background: var(--semantic-danger);
+  color: var(--text-primary);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #dc2626;
+  background: oklch(0.60 0.22 25);
+}
+
+.btn-danger:active:not(:disabled) {
+  background: oklch(0.55 0.22 25);
 }
 
 /* ===== SIZES ===== */
+
 .btn-sm {
   min-height: 36px;
   padding: var(--space-2) var(--space-4);
-  font-size: var(--font-size-sm);
+  font-size: var(--text-sm);
   border-radius: var(--radius-sm);
 }
 
 .btn-lg {
   min-height: 52px;
   padding: var(--space-4) var(--space-8);
-  font-size: var(--font-size-md);
+  font-size: var(--text-lg);
   border-radius: var(--radius-lg);
 }
 
 /* ===== FULL WIDTH ===== */
+
 .btn-block {
   width: 100%;
 }
 
-/* ===== LOADING ===== */
+/* ===== LOADING STATE ===== */
+
 .btn-loading {
-  color: transparent;
+  position: relative;
+  color: transparent !important;
   pointer-events: none;
 }
 
@@ -109,14 +130,42 @@
   position: absolute;
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
+}
+
+/* Primary spinner has different color */
+.btn-primary .btn-spinner {
+  border-color: var(--bg-main);
+  border-top-color: transparent;
+}
+
+/* Danger spinner */
+.btn-danger .btn-spinner {
+  border-color: var(--text-primary);
+  border-top-color: transparent;
 }
 
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .btn-spinner {
+    animation-duration: 1s;
   }
 }

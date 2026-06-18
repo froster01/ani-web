@@ -495,7 +495,8 @@ const useVideoPlayer = ({
     if (!video) return
     const time = video.currentTime || 0
     const now = Date.now()
-    if (now - lastThrottledUpdateTime.current > 60000) {
+    // DEBUG: Changed from 60000 (60s) to 10000 (10s) for testing
+    if (now - lastThrottledUpdateTime.current > 10000) {
       if (sendProgressUpdate()) {
         lastThrottledUpdateTime.current = now
       }

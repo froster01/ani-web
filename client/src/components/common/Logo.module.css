@@ -1,0 +1,104 @@
+/* Premium Logo Lockup - Restrained Treatment */
+
+.logoLockup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  transition: transform var(--duration-base) var(--ease-out-expo);
+}
+
+.logoImage {
+  height: var(--logo-height, 48px);
+  width: auto;
+  flex-shrink: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px oklch(0.05 0 0 / 0.12));
+  transition: 
+    transform var(--duration-base) var(--ease-out-expo),
+    filter var(--duration-base) var(--ease-out-quad);
+}
+
+.logoText {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  color: var(--text-primary);
+  transition: color var(--duration-base) var(--ease-out-quad);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.logoName {
+  font-weight: var(--font-bold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.logoSeparator {
+  color: var(--text-tertiary);
+  font-size: 0.7em;
+  transition: color var(--duration-base) var(--ease-out-quad);
+  margin: 0 -0.125rem;
+}
+
+.logoSubtitle {
+  font-weight: var(--font-normal);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Hover - Restrained amber hint */
+.logoLockup:hover .logoImage {
+  transform: scale(1.03);
+  filter: 
+    drop-shadow(0 2px 8px oklch(0.05 0 0 / 0.12))
+    drop-shadow(0 0 8px oklch(0.70 0.15 70 / 0.25));
+}
+
+.logoLockup:hover .logoText {
+  color: var(--accent-primary);
+}
+
+.logoLockup:hover .logoSeparator {
+  color: var(--accent-primary);
+}
+
+/* Focus state */
+.logoLockup:focus-visible {
+  outline: 3px solid var(--accent-glow);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Compact variant for sidebar */
+.compact .logoText {
+  font-size: var(--text-base);
+  gap: var(--space-1);
+}
+
+.compact {
+  gap: var(--space-2);
+}
+
+/* Mobile - Hide text on small screens in header only */
+@media (max-width: 480px) {
+  .logoText {
+    display: none;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .logoLockup,
+  .logoImage,
+  .logoText,
+  .logoSeparator {
+    transition: none;
+  }
+  
+  .logoLockup:hover .logoImage {
+    transform: none;
+  }
+}

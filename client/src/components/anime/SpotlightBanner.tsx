@@ -108,6 +108,10 @@ const SpotlightBanner: React.FC<SpotlightBannerProps> = ({ animeList }) => {
     navigate(`/watch/${anime._id}`)
   }
 
+  const handleDetails = () => {
+    navigate(`/anime/${anime._id}`)
+  }
+
   const handleWheel = (e: React.WheelEvent) => {
     if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && Math.abs(e.deltaY) > 5) {
       e.preventDefault()
@@ -124,7 +128,7 @@ const SpotlightBanner: React.FC<SpotlightBannerProps> = ({ animeList }) => {
   const metadata = [
     meta.type || 'Anime',
     meta.status,
-    meta.episodeCount ? `${meta.episodeCount} Episodes` : undefined,
+    meta.episodeCount ? `${meta.episodeCount} Episode${meta.episodeCount === 1 ? '' : 's'}` : undefined,
     meta.rating,
   ].filter(Boolean)
 
@@ -142,38 +146,38 @@ const SpotlightBanner: React.FC<SpotlightBannerProps> = ({ animeList }) => {
 
         <div className={styles.overlay}>
           <div className={styles.content}>
-            <div className={styles.badgeRow}>
-              <span className={styles.featureLabel}>Featured</span>
-              {meta.score && (
-                <div className={styles.metaRow} style={{ color: '#fbbf24' }}>
-                  <FaStar size={14} />
-                  <span>{meta.score}</span>
-                </div>
-              )}
-            </div>
+            <span className={styles.featuredLabel}>Featured Selection</span>
 
-            <h1 className={styles.title} onClick={() => navigate(`/anime/${anime._id}`)}>
+            <h1 className={styles.title} onClick={handleDetails}>
               {getTitle(anime)}
             </h1>
 
-            <div className={styles.metaRow}>
+            <div className={styles.metaLine}>
+              {meta.score !== undefined && (
+                <div className={styles.rating}>
+                  <FaStar size={13} />
+                  <span>{meta.score}</span>
+                </div>
+              )}
+              {meta.score !== undefined && metadata.length > 0 && <div className={styles.divider} />}
               {metadata.map((item, idx) => (
                 <React.Fragment key={idx}>
                   <span className={styles.metaItem}>{item}</span>
-                  {idx < metadata.length - 1 && <div className={styles.metaDivider} />}
+                  {idx < metadata.length - 1 && <div className={styles.divider} />}
                 </React.Fragment>
               ))}
+              {visibleGenres.length > 0 && metadata.length > 0 && <div className={styles.divider} />}
+              {visibleGenres.length > 0 && (
+                <div className={styles.genresInline}>
+                  {visibleGenres.map((g, idx) => (
+                    <React.Fragment key={g.name}>
+                      {idx > 0 && <span className={styles.genreSeparator}>·</span>}
+                      <span>{g.name}</span>
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
             </div>
-
-            {visibleGenres.length > 0 && (
-              <div className={styles.genres}>
-                {visibleGenres.map((g) => (
-                  <span key={g.name} className={styles.genreTag}>
-                    {g.name}
-                  </span>
-                ))}
-              </div>
-            )}
 
             {synopsis && <p className={styles.summary}>{synopsis}</p>}
 
@@ -181,6 +185,9 @@ const SpotlightBanner: React.FC<SpotlightBannerProps> = ({ animeList }) => {
               <Button variant="primary" size="md" onClick={handleWatch}>
                 Watch Now
               </Button>
+              <button className={styles.detailsLink} onClick={handleDetails}>
+                Details →
+              </button>
             </div>
           </div>
 

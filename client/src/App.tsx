@@ -1,5 +1,5 @@
 import { useEffect, Suspense, lazy } from 'react'
-import { Routes, Route, Navigate, useParams } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
 import Header from './components/layout/Header'
 import Sidebar from './components/layout/Sidebar'
 import Footer from './components/layout/Footer'
@@ -32,6 +32,8 @@ const PlayerRedirect = () => {
 function App() {
   const { isOpen, setIsOpen } = useSidebar()
   const virtualKeyboard = useVirtualKeyboard()
+  const location = useLocation()
+  const isAuthPage = location.pathname === '/auth'
 
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
@@ -83,7 +85,7 @@ function App() {
             },
           }}
         />
-        <Header />
+        {!isAuthPage && <Header />}
         <Sidebar />
         <main>
           <ErrorBoundary>
@@ -108,7 +110,7 @@ function App() {
             </Suspense>
           </ErrorBoundary>
         </main>
-        <Footer />
+        {!isAuthPage && <Footer />}
         <ScrollToTopButton />
         <VirtualKeyboard
           activeInputRef={virtualKeyboard.activeInputRef}

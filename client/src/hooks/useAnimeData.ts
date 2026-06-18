@@ -465,3 +465,13 @@ export const useGenresAndStudios = () => {
     staleTime: 1000 * 60 * 60,
   })
 }
+
+export const useTodaySchedule = (date?: string) => {
+  const targetDate = date ?? new Date().toISOString().split('T')[0]
+  return useQuery<Anime[]>({
+    queryKey: ['schedule', targetDate],
+    queryFn: () => fetchApi(`/api/anime/schedule/${targetDate}`),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+  })
+}

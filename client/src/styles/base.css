@@ -48,9 +48,7 @@ body::before {
   left: -50%;
   width: 200%;
   height: 200%;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 10% 10%, rgba(6, 182, 212, 0.02) 0%, transparent 40%);
+  background: radial-gradient(circle at 50% 50%, oklch(0.70 0.15 70 / 0.03) 0%, transparent 50%);
   z-index: -1;
   pointer-events: none;
 }
@@ -91,23 +89,22 @@ a {
 }
 
 /* ===== TYPOGRAPHY UTILITIES ===== */
+/* Gradient text is banned - use solid colors with weight/size for emphasis */
 .text-gradient {
-  background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
+  font-weight: var(--font-bold);
 }
 
 .text-gradient-accent {
-  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent-primary);
+  font-weight: var(--font-bold);
 }
 
 /* ===== LAYOUT ===== */
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+
 }
 
 main {
@@ -115,7 +112,6 @@ main {
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 var(--space-8) var(--space-12);
   position: relative;
   z-index: 1;
 }
@@ -128,12 +124,13 @@ main {
 
 /* ===== SECTION ===== */
 .section-title {
-  font-size: 1.75rem;
-  font-weight: 800;
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  font-family: var(--font-heading);
   margin-bottom: var(--space-8);
   color: var(--text-primary);
-  letter-spacing: -0.02em;
-  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
 }
 
 @media (max-width: 768px) {

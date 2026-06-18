@@ -1,28 +1,24 @@
 import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { FaUser, FaLock, FaKey, FaEye, FaEyeSlash } from 'react-icons/fa'
+import { FaUser, FaLock, FaEye, FaEyeSlash, FaArrowRight } from 'react-icons/fa'
 import styles from './Auth.module.css'
 
 interface ValidationErrors {
   username?: string
   password?: string
-  licenseKey?: string
 }
 
 const Auth: React.FC = () => {
-  const [mode, setMode] = useState<'login' | 'register'>('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [licenseKey, setLicenseKey] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<ValidationErrors>({})
-  const [touched, setTouched] = useState<{ username: boolean; password: boolean; licenseKey: boolean }>({
+  const [touched, setTouched] = useState<{ username: boolean; password: boolean }>({
     username: false,
     password: false,
-    licenseKey: false,
   })
   const [isLoading, setIsLoading] = useState(false)
-  const { login, register } = useAuth()
+  const { login } = useAuth()
 
   const validate = (): ValidationErrors => {
     const newErrors: ValidationErrors = {}
@@ -39,10 +35,6 @@ const Auth: React.FC = () => {
       newErrors.password = 'Password must be less than 100 characters'
     }
 
-    if (mode === 'register' && !licenseKey.trim()) {
-      newErrors.licenseKey = 'License key is required'
-    }
-
     return newErrors
   }
 
@@ -53,22 +45,14 @@ const Auth: React.FC = () => {
     setErrors(validationErrors)
 
     if (Object.keys(validationErrors).length > 0) {
-      setTouched({ username: true, password: true, licenseKey: true })
+      setTouched({ username: true, password: true })
       return
     }
 
     setIsLoading(true)
 
     try {
-      if (mode === 'login') {
-        await login(username.trim(), password)
-      } else {
-        await register(username.trim(), password, licenseKey.trim())
-        // Switch to login mode after successful registration
-        setMode('login')
-        setPassword('')
-        setLicenseKey('')
-      }
+      await login(username.trim(), password)
     } catch (error) {
       // Error is handled by AuthContext with toast
     } finally {
@@ -76,51 +60,48 @@ const Auth: React.FC = () => {
     }
   }
 
-  const handleBlur = (field: 'username' | 'password' | 'licenseKey') => {
+  const handleBlur = (field: 'username' | 'password') => {
     setTouched({ ...touched, [field]: true })
     setErrors(validate())
   }
 
-  const toggleMode = () => {
-    setMode(mode === 'login' ? 'register' : 'login')
-    setErrors({})
-    setTouched({ username: false, password: false, licenseKey: false })
-  }
-
   React.useEffect(() => {
-    document.title = mode === 'login' ? 'Login - ani-web' : 'Register - ani-web'
-  }, [mode])
+    document.title = 'Login - ani-web'
+  }, [])
 
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
-        <div className={styles.glowFrame} />
-        
         <div className={styles.card}>
           <div className={styles.header}>
             <div className={styles.logoContainer}>
-              <div className={styles.logo}>📺</div>
+              <img src="/logo.png" alt="Rynix Logo" className={styles.logo} />
             </div>
-            <h1 className={styles.title}>ANI-WEB</h1>
-            <p className={styles.subtitle}>
-              {mode === 'login' ? 'Welcome back' : 'Create your account'}
-            </p>
+            <h1 className={styles.title}>
+              Welcome <span className={styles.titleAccent}>Back</span>
+            </h1>
+            <p className={styles.subtitle}>Sign in to continue</p>
           </div>
 
           <form onSubmit={handleSubmit} className={styles.form}>
             {/* Username */}
             <div className={styles.inputGroup}>
+              <label htmlFor="username" className={styles.label}>
+                Username
+              </label>
               <div className={styles.inputWrapper}>
                 <FaUser className={styles.inputIcon} />
                 <input
+                  id="username"
                   type="text"
                   className={`${styles.input} ${touched.username && errors.username ? styles.inputError : ''}`}
-                  placeholder="Username"
+                  placeholder="Enter your username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   onBlur={() => handleBlur('username')}
                   disabled={isLoading}
                   autoComplete="username"
+                  autoFocus
                 />
               </div>
               {touched.username && errors.username && (
@@ -130,17 +111,21 @@ const Auth: React.FC = () => {
 
             {/* Password */}
             <div className={styles.inputGroup}>
+              <label htmlFor="password" className={styles.label}>
+                Password
+              </label>
               <div className={styles.inputWrapper}>
                 <FaLock className={styles.inputIcon} />
                 <input
+                  id="password"
                   type={showPassword ? 'text' : 'password'}
                   className={`${styles.input} ${touched.password && errors.password ? styles.inputError : ''}`}
-                  placeholder="Password"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onBlur={() => handleBlur('password')}
                   disabled={isLoading}
-                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
@@ -157,52 +142,15 @@ const Auth: React.FC = () => {
               )}
             </div>
 
-            {/* License Key (register only) */}
-            {mode === 'register' && (
-              <div className={styles.inputGroup}>
-                <div className={styles.inputWrapper}>
-                  <FaKey className={styles.inputIcon} />
-                  <input
-                    type="text"
-                    className={`${styles.input} ${touched.licenseKey && errors.licenseKey ? styles.inputError : ''}`}
-                    placeholder="License Key"
-                    value={licenseKey}
-                    onChange={(e) => setLicenseKey(e.target.value)}
-                    onBlur={() => handleBlur('licenseKey')}
-                    disabled={isLoading}
-                    autoComplete="off"
-                  />
-                </div>
-                {touched.licenseKey && errors.licenseKey && (
-                  <p className={styles.error}>{errors.licenseKey}</p>
-                )}
-              </div>
-            )}
-
             {/* Submit Button */}
             <button
               type="submit"
               className={styles.submitButton}
               disabled={isLoading}
             >
-              {isLoading ? 'Loading...' : mode === 'login' ? 'LOGIN' : 'REGISTER'}
+              <span>{isLoading ? 'Signing in...' : 'Sign In'}</span>
+              <FaArrowRight />
             </button>
-
-            {/* Toggle Mode */}
-            <div className={styles.toggleMode}>
-              <p>
-                {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
-                {' '}
-                <button
-                  type="button"
-                  onClick={toggleMode}
-                  className={styles.toggleLink}
-                  disabled={isLoading}
-                >
-                  {mode === 'login' ? 'Register' : 'Login'}
-                </button>
-              </p>
-            </div>
           </form>
         </div>
       </div>

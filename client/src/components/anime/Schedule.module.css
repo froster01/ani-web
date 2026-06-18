@@ -1,5 +1,7 @@
+/* Premium Schedule Component */
+
 .scheduleSection {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--space-12);
 }
 
 .sectionHeader {
@@ -35,19 +37,197 @@
   display: none;
 }
 
+.dayBtn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: 
+    background-color var(--duration-fast) var(--ease-out-quad),
+    border-color var(--duration-fast) var(--ease-out-quad),
+    color var(--duration-fast) var(--ease-out-quad),
+    transform var(--duration-fast) var(--ease-out-quart);
+  min-width: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.dayBtn:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-secondary);
+  transform: translateY(-2px);
+}
+
+.dayBtn.active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: var(--bg-main);
+  box-shadow: 0 4px 12px oklch(0.70 0.15 70 / 0.3);
+  transform: translateY(-2px);
+}
+
+.dayMonth {
+  font-size: 10px;
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  opacity: 0.8;
+}
+
+.dayNum {
+  font-size: var(--text-lg);
+  font-weight: var(--font-black);
+  font-family: var(--font-heading);
+  line-height: 1;
+}
+
+.dayName {
+  font-size: 10px;
+  font-weight: var(--font-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-normal);
+}
+
+.dayBtn.active .dayMonth,
+.dayBtn.active .dayName {
+  opacity: 1;
+}
+
+/* ===== NAV ARROWS ===== */
+.navArrows {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--bg-tertiary);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-primary);
+}
+
+.navButton {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 
+    background-color var(--duration-fast) var(--ease-out-quad),
+    color var(--duration-fast) var(--ease-out-quad),
+    transform var(--duration-fast) var(--ease-out-quart);
+}
+
+.navButton:hover {
+  background: var(--bg-elevated);
+  color: var(--accent-primary);
+}
+
+.navButton:active {
+  transform: scale(0.95);
+}
+
+.navButton:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 2px;
+}
+
+/* ===== CAROUSEL ===== */
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+}
+
+.carousel {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  padding-bottom: var(--space-2);
+  min-height: 260px;
+}
+
+.carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.carousel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.carousel::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+}
+
+.carouselCard {
+  flex: 0 0 calc((100% - (6 * var(--space-4))) / 7);
+  min-width: 150px;
+}
+
+@media (max-width: 1400px) {
+  .carouselCard {
+    flex: 0 0 calc((100% - (5 * var(--space-4))) / 6);
+  }
+}
+
+@media (max-width: 1200px) {
+  .carouselCard {
+    flex: 0 0 calc((100% - (4 * var(--space-4))) / 5);
+  }
+}
+
+@media (max-width: 1024px) {
+  .carouselCard {
+    flex: 0 0 calc((100% - (3 * var(--space-4))) / 4);
+  }
+}
+
+@media (max-width: 768px) {
+  .carouselCard {
+    flex: 0 0 calc((100% - (2 * var(--space-3))) / 3);
+    min-width: 0;
+  }
+
+  .carousel {
+    gap: var(--space-3);
+  }
+
+  .daySelector {
+    justify-content: flex-start;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+
+  .dayBtn {
+    min-width: 60px;
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
 @media (max-width: 600px) {
   .daySelector {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: var(--space-1);
     overflow-x: hidden;
     padding: var(--space-1) 0;
   }
 
   .dayBtn {
     min-width: 0 !important;
-    padding: var(--space-1) 2px !important;
-    border-radius: var(--radius-md) !important;
+    padding: var(--space-1) var(--space-1) !important;
+    border-radius: var(--radius-sm) !important;
   }
 
   .dayMonth {
@@ -63,164 +243,30 @@
   }
 
   .dayBtn.active {
-    transform: translateY(-2px) !important;
-  }
-}
-
-.dayBtn {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-primary);
-  color: var(--text-secondary);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all var(--transition-base);
-  min-width: 70px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  flex-shrink: 0;
-}
-
-.dayBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--border-secondary);
-  transform: translateY(-2px);
-}
-
-.dayBtn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  box-shadow: 0 8px 20px var(--accent-glow);
-  transform: translateY(-4px);
-}
-
-.dayMonth {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.8;
-}
-
-.dayNum {
-  font-size: 1.25rem;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.dayName {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.dayBtn.active .dayMonth,
-.dayBtn.active .dayName {
-  opacity: 1;
-}
-
-/* ===== NAV ARROWS ===== */
-.navArrows {
-  display: flex;
-  gap: 8px;
-  background: var(--bg-tertiary);
-  padding: 4px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-primary);
-}
-
-.navButton {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all var(--transition-base);
-}
-
-.navButton:hover {
-  background: var(--bg-elevated);
-  color: var(--accent);
-}
-
-.navButton:active {
-  transform: scale(0.9);
-}
-
-/* ===== CAROUSEL ===== */
-.carouselContainer {
-  position: relative;
-  width: 100%;
-  min-height: 280px;
-}
-
-.carousel {
-  display: flex;
-  gap: 15px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  padding-bottom: 10px;
-  min-height: 260px;
-}
-
-.carousel::-webkit-scrollbar {
-  display: none;
-}
-
-.carouselCard {
-  flex: 0 0 calc((100% - (6 * 15px)) / 7);
-  min-width: 150px;
-}
-
-@media (max-width: 1200px) {
-  .carouselCard {
-    flex: 0 0 calc((100% - (5 * 15px)) / 6);
-  }
-}
-
-@media (max-width: 1024px) {
-  .carouselCard {
-    flex: 0 0 calc((100% - (4 * 15px)) / 5);
-  }
-}
-
-@media (max-width: 768px) {
-  .carouselCard {
-    flex: 0 0 calc((100% - (2 * 15px)) / 3);
-    min-width: 0;
-  }
-
-  .daySelector {
-    justify-content: flex-start;
-    padding-left: var(--space-4);
-    padding-right: var(--space-4);
-  }
-
-  .dayBtn {
-    min-width: 60px;
-    padding: var(--space-2) var(--space-3);
+    transform: translateY(-1px) !important;
   }
 }
 
 @media (max-width: 480px) {
   .carouselCard {
-    flex: 0 0 calc((100% - (2 * 10px)) / 3);
+    flex: 0 0 calc((100% - (2 * var(--space-2))) / 3);
     min-width: 0;
   }
 
   .carousel {
-    gap: 10px;
+    gap: var(--space-2);
     align-items: flex-start;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .dayBtn:hover,
+  .dayBtn.active {
+    transform: none;
+  }
+
+  .navButton:active {
+    transform: none;
   }
 }

@@ -1,16 +1,23 @@
 import React from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useSidebar } from '../../hooks/useSidebar'
+import { useAuth } from '../../contexts/AuthContext'
 import styles from './Sidebar.module.css'
-import { FaHome, FaSearch, FaClock, FaFileImport, FaCog, FaChartPie } from 'react-icons/fa'
+import { FaHome, FaSearch, FaClock, FaFileImport, FaCog, FaChartPie, FaSignOutAlt } from 'react-icons/fa'
 import Logo from '../common/Logo'
 import packageJson from '../../../package.json'
 
 const Sidebar: React.FC = () => {
   const { isOpen, setIsOpen } = useSidebar()
+  const { logout } = useAuth()
 
   const handleNavLinkClick = () => {
     setIsOpen(false)
+  }
+
+  const handleLogout = async () => {
+    setIsOpen(false)
+    await logout()
   }
 
   const navItems = [
@@ -27,7 +34,7 @@ const Sidebar: React.FC = () => {
       <aside className={`${styles.sidebar} ${isOpen ? styles.open : ''} sidebar`}>
         <div className={styles.sidebarHeader}>
           <Link to="/" className={styles.logo} onClick={handleNavLinkClick}>
-            <Logo />
+            <Logo compact />
           </Link>
           <button
             className={styles.closeBtn}
@@ -52,6 +59,15 @@ const Sidebar: React.FC = () => {
             </NavLink>
           ))}
         </nav>
+
+        <button 
+          className={styles.logoutBtn}
+          onClick={handleLogout}
+          aria-label="Log out"
+        >
+          <FaSignOutAlt />
+          <span>Log Out</span>
+        </button>
 
         <div className={styles.versionInfo}>Version {packageJson.version}</div>
       </aside>

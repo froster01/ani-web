@@ -5,6 +5,7 @@ declare module 'hls.js/dist/hls.light.mjs' {
 
 interface ImportMetaEnv {
   readonly VITE_TELEMETRY_URL: string
+  readonly VITE_API_BASE_URL: string
 }
 
 interface ImportMeta {

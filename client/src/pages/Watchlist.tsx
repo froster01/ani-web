@@ -22,7 +22,6 @@ import SearchableSelect from '../components/common/SearchableSelect'
 import {
   usePaginatedWatchlist,
   useRemoveFromWatchlist,
-  usePaginatedAllContinueWatching,
   useGenresAndStudios,
 } from '../hooks/useAnimeData'
 import { useSetting, useUpdateSetting } from '../hooks/useSettings'
@@ -32,7 +31,6 @@ import styles from './Watchlist.module.css'
 
 const FILTERS = [
   'All',
-  'Continue Watching',
   'Watching',
   'Completed',
   'On-Hold',
@@ -40,7 +38,7 @@ const FILTERS = [
   'Planned',
 ]
 
-const STATUS_OPTIONS = FILTERS.slice(2)
+const STATUS_OPTIONS = FILTERS.slice(1)
 
 interface Option {
   value: string
@@ -127,7 +125,6 @@ const Watchlist: React.FC = () => {
 
   const [itemToRemove, setItemToRemove] = useState<{ id: string; name: string } | null>(null)
 
-  const isCW = filterBy === 'Continue Watching'
   const watchlistQueryString = useMemo(() => {
     const params = new URLSearchParams(searchParams)
     params.delete('page')
@@ -136,25 +133,18 @@ const Watchlist: React.FC = () => {
   }, [searchParams, titlePreference])
 
   const {
-    data: cwData,
-    isLoading: loadingCW,
-    error: errorCW,
-  } = usePaginatedAllContinueWatching(watchlistQueryString, page, 14)
-
-  const {
     data: wlData,
     isLoading: loadingWL,
     error: errorWL,
   } = usePaginatedWatchlist(filterBy, watchlistQueryString, page, 14)
 
-  const { data: nextCwData } = usePaginatedAllContinueWatching(watchlistQueryString, page + 1, 14)
   const { data: nextWlData } = usePaginatedWatchlist(filterBy, watchlistQueryString, page + 1, 14)
 
-  const list = useMemo(() => (isCW ? cwData?.data : wlData?.data) || [], [isCW, cwData, wlData])
-  const total = useMemo(() => (isCW ? cwData?.total : wlData?.total) || 0, [isCW, cwData, wlData])
-  const isLoading = isCW ? loadingCW : loadingWL
-  const error = isCW ? errorCW : errorWL
-  const nextPageData = isCW ? nextCwData : nextWlData
+  const list = useMemo(() => wlData?.data || [], [wlData])
+  const total = useMemo(() => wlData?.total || 0, [wlData])
+  const isLoading = loadingWL
+  const error = errorWL
+  const nextPageData = nextWlData
 
   useEffect(() => {
     setQuery(searchParams.get('query') || '')
@@ -183,18 +173,6 @@ const Watchlist: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['watchlist'] })
       toast.success('Status updated')
     },
-  })
-
-  const removeCw = useMutation({
-    mutationFn: async (showId: string) => {
-      await fetch('/api/anime/continue-watching/remove', {
-        credentials: 'include',
-        method: 'POST',
-        body: JSON.stringify({ showId }),
-        headers: { 'Content-Type': 'application/json' },
-      })
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['allContinueWatching'] }),
   })
 
   const removeWl = useRemoveFromWatchlist()
@@ -296,11 +274,6 @@ const Watchlist: React.FC = () => {
   }
 
   const handleRemove = (id: string, name: string) => {
-    if (isCW) {
-      setItemToRemove({ id, name })
-      return
-    }
-
     const shouldSkip = String(skipConfirm) === 'true' || String(skipConfirm) === '1'
     if (shouldSkip) {
       removeWl.mutate(id)
@@ -311,14 +284,7 @@ const Watchlist: React.FC = () => {
 
   const confirmRemove = (opts: { removeFromWatchlist?: boolean; rememberPreference?: boolean }) => {
     if (!itemToRemove) return
-    if (isCW) {
-      removeCw.mutate(itemToRemove.id)
-      if (opts.removeFromWatchlist) {
-        removeWl.mutate(itemToRemove.id)
-      }
-    } else {
-      removeWl.mutate(itemToRemove.id)
-    }
+    removeWl.mutate(itemToRemove.id)
     if (opts.rememberPreference)
       updateSetting.mutate({ key: 'skipRemoveConfirmation', value: true })
     setItemToRemove(null)
@@ -506,7 +472,7 @@ const Watchlist: React.FC = () => {
 
       <div className={styles.resultsHeader} ref={gridRef}>
         <h3 className={styles.resultsTitle}>
-          {isCW ? 'Continue Watching' : filterBy}
+          {filterBy}
           <span className={styles.itemCount}>({total} items)</span>
         </h3>
 
@@ -543,22 +509,21 @@ const Watchlist: React.FC = () => {
             <div key={item._id} className={styles.itemWrapper}>
               <AnimeCard
                 anime={item}
-                continueWatching={isCW}
+                continueWatching={false}
                 onRemove={() => handleRemove(item.id, item.name)}
                 layout="vertical"
               />
-              {!isCW && (
-                <div className={styles.cardActions}>
-                  <select
-                    className={styles.statusSelect}
-                    value={item.status}
-                    onChange={(e) =>
-                      updateStatus.mutate({ id: item.id, status: e.currentTarget.value })
-                    }
-                  >
-                    {STATUS_OPTIONS.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
+              <div className={styles.cardActions}>
+                <select
+                  className={styles.statusSelect}
+                  value={item.status}
+                  onChange={(e) =>
+                    updateStatus.mutate({ id: item.id, status: e.currentTarget.value })
+                  }
+                >
+                  {STATUS_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
                       </option>
                     ))}
                   </select>
@@ -570,7 +535,6 @@ const Watchlist: React.FC = () => {
                     <FaTrash size={12} />
                   </button>
                 </div>
-              )}
             </div>
           ))}
         </div>
@@ -613,7 +577,7 @@ const Watchlist: React.FC = () => {
         onClose={() => setItemToRemove(null)}
         onConfirm={confirmRemove}
         animeName={itemToRemove?.name || ''}
-        scenario={isCW ? 'continueWatching' : 'watchlist'}
+        scenario="watchlist"
       />
     </div>
   )
