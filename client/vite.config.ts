@@ -3,6 +3,7 @@ import preact from '@preact/preset-vite'
 
 export default defineConfig({
   plugins: [preact()],
+
   server: {
     port: 5174,
     proxy: {
@@ -13,6 +14,13 @@ export default defineConfig({
       },
     },
   },
+
+  preview: {
+    host: '0.0.0.0',
+    port: 4173,
+    allowedHosts: ['tsuki.fishthor.com'],
+  },
+
   resolve: {
     alias: {
       react: 'preact/compat',
@@ -21,6 +29,7 @@ export default defineConfig({
       'react/jsx-runtime': 'preact/jsx-runtime',
     },
   },
+
   build: {
     rollupOptions: {
       output: {
