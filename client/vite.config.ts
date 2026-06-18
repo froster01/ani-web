@@ -16,10 +16,10 @@ export default defineConfig({
   },
 
   preview: {
-  host: '0.0.0.0',
-  port: 4173,
-  allowedHosts: ['rynix.fishthor.com'],
-},
+    host: '0.0.0.0',
+    port: 4173,
+    allowedHosts: ['tsuki.fishthor.com'],
+  },
 
   resolve: {
     alias: {
